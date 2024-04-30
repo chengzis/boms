@@ -1,8 +1,11 @@
+import groovy.util.Node
+import org.dom4j.Element
+import org.dom4j.io.SAXReader
+
 plugins {
     kotlin("jvm") version "1.9.23"
+    id("com.vanniktech.maven.publish") version "0.28.0"
 }
-
-group = "com.github.chengzis.bom"
 
 repositories {
     mavenCentral()
@@ -18,3 +21,23 @@ tasks.test {
 kotlin {
     jvmToolchain(17)
 }
+
+group = "io.github.chengzis"
+
+
+
+//
+//
+//File(rootProject.projectDir, "output").listFiles()?.forEach { artifact ->
+//    val version = artifact.listFiles()?.firstOrNull()
+//    if (version != null) {
+//
+//
+//
+//        mavenPublishing {
+//
+//
+//
+//        }
+//    }
+//}

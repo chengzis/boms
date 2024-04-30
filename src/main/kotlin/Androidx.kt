@@ -2,9 +2,10 @@ package com.github.chengzis.bom
 
 import com.github.chengzis.bom.pom.DependencyManagement
 import com.github.chengzis.bom.pom.Project
+import com.github.chengzis.bom.utils.export
 import com.github.chengzis.bom.version.*
 
-object Androidx {
+object Androidx : IExportArtifact {
 
     object Activity : VersionsDependency(
         groupId = "androidx.activity",
@@ -247,7 +248,7 @@ object Androidx {
     }
 
 
-    fun build(sdkVersion: AndroidSdkVersion, moduleVersion: String): Project {
+    private fun build(sdkVersion: AndroidSdkVersion, moduleVersion: String): Project {
         return Project(
             artifactId = "androidx-bom-${sdkVersion.sdkInt}",
             version = moduleVersion,
@@ -322,5 +323,14 @@ object Androidx {
                 )
             )
         )
+    }
+
+    override fun export() {
+        val version = "0.0.1-beta"
+        build(AndroidSdkVersion.P, version).export()
+        build(AndroidSdkVersion.S, version).export()
+        build(AndroidSdkVersion.S_V2, version).export()
+        build(AndroidSdkVersion.TIRAMISU, version).export()
+        build(AndroidSdkVersion.UPSIDE_DOWN_CAKE, version).export()
     }
 }

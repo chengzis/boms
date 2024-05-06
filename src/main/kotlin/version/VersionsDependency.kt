@@ -16,8 +16,8 @@ open class VersionsDependency(
         return VersionsDependency(groupId, artifactId, versions)
     }
 
-    fun subArtifact(subArtifactId: String, separator: String = "-"): VersionsDependency =
-        copy(artifactId = "${artifactId}${separator}$subArtifactId")
+    fun subArtifact(subArtifactId: String, separator: String = "-", versions: List<Version> = this.versions): VersionsDependency =
+        copy(artifactId = "${artifactId}${separator}$subArtifactId", versions = versions)
 
 }
 

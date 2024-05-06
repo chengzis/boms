@@ -7,6 +7,42 @@ import com.github.chengzis.bom.version.*
 
 object Androidx : IExportArtifact {
 
+    object Core : VersionsDependency(
+        groupId = "androidx.core",
+        artifactId = "core",
+        versions = listOf(
+            Version("1.13.1", AndroidSdkVersion.UPSIDE_DOWN_CAKE),
+            Version("1.10.1", AndroidSdkVersion.TIRAMISU),
+            Version("1.8.0", AndroidSdkVersion.S),
+            Version("1.6.0", AndroidSdkVersion.P),
+        )
+    ), IKtxDependencies {
+
+        val animation = subArtifact(
+            subArtifactId = "animation",
+            versions = listOf(
+                Version("1.0.0", AndroidSdkVersion.UPSIDE_DOWN_CAKE),
+            )
+        )
+
+        val role = subArtifact(
+            subArtifactId = "role",
+            versions = listOf(
+                Version("1.0.0", AndroidSdkVersion.P),
+            )
+        )
+
+        val splashscreen = subArtifact(
+            subArtifactId = "splashscreen",
+            versions = listOf(
+                Version("1.2.0-alpha01", AndroidSdkVersion.UPSIDE_DOWN_CAKE),
+                Version("1.1.0-rc01", AndroidSdkVersion.S),
+            )
+        )
+
+
+    }
+
     object Activity : VersionsDependency(
         groupId = "androidx.activity",
         artifactId = "activity",
@@ -53,7 +89,16 @@ object Androidx : IExportArtifact {
             Version("2.42", AndroidSdkVersion.R),
             Version("2.39", AndroidSdkVersion.P),
         )
-    ), ICompilerDependencies
+    ), ICompilerDependencies {
+
+        val gradlePlugin = VersionsDependency(
+            groupId = "com.google.dagger.hilt.android",
+            artifactId = "com.google.dagger.hilt.android.gradle.plugin",
+            versions = versions
+        )
+
+
+    }
 
     object Lifecycle {
 
@@ -248,13 +293,29 @@ object Androidx : IExportArtifact {
     }
 
 
-    private fun build(sdkVersion: AndroidSdkVersion, moduleVersion: String): Project {
+    private val startup = VersionsDependency(
+        groupId = "androidx.startup",
+        artifactId = "startup-runtime",
+        versions = listOf(
+            Version("1.1.1", AndroidSdkVersion.S),
+            Version("1.1.0", AndroidSdkVersion.R),
+            Version("1.0.0", AndroidSdkVersion.P),
+        )
+    )
+
+    private fun build(sdkVersion: AndroidSdkVersion): Project {
         return Project(
             artifactId = "androidx-bom-${sdkVersion.sdkInt}",
-            version = moduleVersion,
+            version = MODULE_VERSION,
             description = "androidx的bom",
             dependencyManagement = DependencyManagement(
                 listOfNotNull(
+                    Core.build(sdkVersion),
+                    Core.ktx.build(sdkVersion),
+                    Core.animation.build(sdkVersion),
+                    Core.role.build(sdkVersion),
+                    Core.splashscreen.build(sdkVersion),
+
                     Activity.build(sdkVersion),
                     Activity.ktx.build(sdkVersion),
 
@@ -319,18 +380,22 @@ object Androidx : IExportArtifact {
                     Media3.common.build(sdkVersion),
 
                     Hilt.build(sdkVersion),
+                    Hilt.gradlePlugin.build(sdkVersion),
                     Hilt.compiler.build(sdkVersion),
+
+                    startup.build(sdkVersion),
                 )
             )
         )
     }
 
+    private const val MODULE_VERSION = "0.0.2-beta"
+
     override fun export() {
-        val version = "0.0.1-beta"
-        build(AndroidSdkVersion.P, version).export()
-        build(AndroidSdkVersion.S, version).export()
-        build(AndroidSdkVersion.S_V2, version).export()
-        build(AndroidSdkVersion.TIRAMISU, version).export()
-        build(AndroidSdkVersion.UPSIDE_DOWN_CAKE, version).export()
+        build(AndroidSdkVersion.P).export()
+        build(AndroidSdkVersion.S).export()
+        build(AndroidSdkVersion.S_V2).export()
+        build(AndroidSdkVersion.TIRAMISU).export()
+        build(AndroidSdkVersion.UPSIDE_DOWN_CAKE).export()
     }
 }

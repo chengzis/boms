@@ -6,10 +6,10 @@ data class DependencyManagement(
     val dependencies: List<Dependency>
 ) : IDocument {
 
-    override fun build(branch: Branch) {
+    override fun generat(branch: Branch) {
         val element = branch.addElement("dependencies")
         dependencies.forEach {
-            it.build(element)
+            it.generat(element.addElement("dependency"))
         }
     }
 }

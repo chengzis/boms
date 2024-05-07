@@ -2,24 +2,40 @@ package com.github.chengzis.bom.version
 
 import com.github.chengzis.bom.pom.Dependency
 
-open class VersionsDependency(
-    val groupId: String,
-    val artifactId: String,
+interface IVersionsDependency {
+
+    val groupId: String
+    val artifactId: String
     val versions: List<Version>
-) {
-
-    fun copy(
-        groupId: String = this.groupId,
-        artifactId: String = this.artifactId,
-        versions: List<Version> = this.versions
-    ): VersionsDependency {
-        return VersionsDependency(groupId, artifactId, versions)
-    }
-
-    fun subArtifact(subArtifactId: String, separator: String = "-", versions: List<Version> = this.versions): VersionsDependency =
-        copy(artifactId = "${artifactId}${separator}$subArtifactId", versions = versions)
 
 }
+
+fun IVersionsDependency.copy(
+    groupId: String = this.groupId,
+    artifactId: String = this.artifactId,
+    versions: List<Version> = this.versions
+): VersionsDependency {
+    return VersionsDependency(groupId, artifactId, versions)
+}
+
+fun IVersionsDependency.subArtifact(
+    subArtifactId: String,
+    separator: String = "-",
+    versions: List<Version> = this.versions
+): VersionsDependency =
+    copy(artifactId = "${artifactId}${separator}$subArtifactId", versions = versions)
+
+open class VersionsDependency(
+    override val groupId: String,
+    override val artifactId: String,
+    override val versions: List<Version>
+) : IVersionsDependency
+
+abstract class VersionsDependencyGroup(
+    override val groupId: String,
+    override val artifactId: String,
+    override val versions: List<Version>
+) : IVersionsDependency
 
 
 fun VersionsDependency.build(sdkVersion: AndroidSdkVersion): Dependency? {
@@ -35,17 +51,32 @@ fun VersionsDependency.build(sdkVersion: AndroidSdkVersion): Dependency? {
 }
 
 
-interface IComposeDependencies
+interface IComposeDependencies : IVersionsDependency {
 
-interface IKtxDependencies
+    val compose get() = subArtifact("compose")
 
-interface ICompilerDependencies
+}
 
-val <T> T.compose where T : IComposeDependencies, T : VersionsDependency
-    get() = copy(artifactId = "$artifactId-compose")
+interface IKtxDependencies : IVersionsDependency {
 
-val <T> T.ktx where T : IKtxDependencies, T : VersionsDependency
-    get() = copy(artifactId = "$artifactId-ktx")
+    val ktx get() = subArtifact("ktx")
 
-val <T> T.compiler where T : ICompilerDependencies, T : VersionsDependency
-    get() = copy(artifactId = "$artifactId-compiler")
+}
+
+interface ICompilerDependencies : IComposeDependencies {
+
+    val compiler get() = subArtifact("compiler")
+
+}
+
+interface ITestingDependencies : IComposeDependencies {
+
+    val testing get() = subArtifact("testing")
+
+}
+
+interface ITestDependencies : IComposeDependencies {
+
+    val test get() = subArtifact("test")
+
+}

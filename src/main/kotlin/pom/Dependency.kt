@@ -7,10 +7,9 @@ data class Dependency(
     val artifactId: String,
     val version: String
 ) : IDocument {
-    override fun build(branch: Branch) {
-        val element = branch.addElement("dependency")
-        element.addElement(::groupId.name).addText(groupId)
-        element.addElement(::artifactId.name).addText(artifactId)
-        element.addElement(::version.name).addText(version)
+    override fun generat(branch: Branch) {
+        branch.addElement(::groupId.name).addText(groupId)
+        branch.addElement(::artifactId.name).addText(artifactId)
+        branch.addElement(::version.name).addText(version)
     }
 }

@@ -13,7 +13,7 @@ data class Developer(
     }
 
 
-    override fun build(branch: Branch) {
+    override fun generat(branch: Branch) {
         val element = branch.addElement("developer")
         element.addElement(::name.name).addText(name)
     }

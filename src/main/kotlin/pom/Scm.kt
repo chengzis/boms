@@ -23,7 +23,7 @@ data class Scm(
 
     }
 
-    override fun build(branch: Branch) {
+    override fun generat(branch: Branch) {
         branch.addElement(::connection.name).addText(connection)
         branch.addElement(::developerConnection.name).addText(developerConnection)
         branch.addElement(::url.name).addText(url)

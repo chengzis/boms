@@ -10,7 +10,7 @@ import java.io.FileOutputStream
 
 fun Project.export() {
     val document = DocumentHelper.createDocument()
-    build(document)
+    generat(document)
 
     val format = OutputFormat.createPrettyPrint()
     format.setIndent("    ")
@@ -18,12 +18,9 @@ fun Project.export() {
 
 
     val root = File("output")
-    root.delete()
+    root.deleteRecursively()
     val dir = File(File(root, groupId), artifactId)
     dir.mkdirs()
-    dir.listFiles()?.forEach {
-        it.delete()
-    }
     val file = File(dir, "$version.pom")
     FileOutputStream(file).use {
         val writer = XMLWriter(it, format)

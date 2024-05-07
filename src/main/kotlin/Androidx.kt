@@ -1,6 +1,8 @@
 package com.github.chengzis.bom
 
+import com.github.chengzis.bom.pom.Build
 import com.github.chengzis.bom.pom.DependencyManagement
+import com.github.chengzis.bom.pom.PluginManagement
 import com.github.chengzis.bom.pom.Project
 import com.github.chengzis.bom.utils.export
 import com.github.chengzis.bom.version.*
@@ -52,7 +54,7 @@ object Androidx : IExportArtifact {
             Version("1.3.1", AndroidSdkVersion.R),
             Version("1.2.4", AndroidSdkVersion.P),
         )
-    ), IKtxDependencies
+    ), IKtxDependencies, IComposeDependencies
 
     object Appcompat : VersionsDependency(
         groupId = "androidx.appcompat",
@@ -221,7 +223,7 @@ object Androidx : IExportArtifact {
     }
 
 
-    object Media3 : VersionsDependency(
+    object Media3 : VersionsDependencyGroup(
         groupId = "androidx.media3",
         artifactId = "media3",
         versions = listOf(
@@ -303,6 +305,96 @@ object Androidx : IExportArtifact {
         )
     )
 
+    object Room : VersionsDependencyGroup(
+        groupId = "androidx.room",
+        artifactId = "room",
+        versions = listOf(
+            Version("2.6.1", AndroidSdkVersion.UPSIDE_DOWN_CAKE),
+            Version("2.5.2", AndroidSdkVersion.TIRAMISU),
+        )
+    ), ICompilerDependencies, IKtxDependencies, ITestingDependencies {
+
+        val runtime = subArtifact("runtime")
+
+        val paging = subArtifact("paging")
+
+        val rxjava2 = subArtifact("rxjava2")
+
+        val rxjava3 = subArtifact("rxjava3")
+
+        val guava = subArtifact("guava")
+    }
+
+    object Concurrent : VersionsDependency(
+        groupId = "androidx.concurrent",
+        artifactId = "concurrent",
+        versions = listOf(
+            Version("1.1.0", AndroidSdkVersion.P),
+        )
+    ) {
+
+        object Futures : VersionsDependency(
+            groupId = groupId,
+            artifactId = "$artifactId-futures",
+            versions = versions
+        ), IKtxDependencies
+
+    }
+
+    object Test {
+
+        val junit = VersionsDependency(
+            groupId = "junit",
+            artifactId = "junit",
+            versions = listOf(
+                Version("4.13.2", AndroidSdkVersion.P),
+            )
+        )
+
+        val ext = VersionsDependency(
+            groupId = "androidx.test.ext",
+            artifactId = "junit",
+            versions = listOf(
+                Version("1.1.5", AndroidSdkVersion.P),
+
+                )
+        )
+
+        val espresso = VersionsDependency(
+            groupId = "androidx.test.espresso",
+            artifactId = "espresso-core",
+            versions = listOf(
+                Version("3.5.1", AndroidSdkVersion.P),
+            )
+        )
+
+        val rules = VersionsDependency(
+            groupId = "androidx.test",
+            artifactId = "rules",
+            versions = listOf(
+                Version("1.5.0", AndroidSdkVersion.P),
+            )
+        )
+
+    }
+
+    private val material = VersionsDependency(
+        groupId = "com.google.android.material",
+        artifactId = "material",
+        versions = listOf(
+            Version("1.12.0", AndroidSdkVersion.TIRAMISU),
+            Version("1.9.0", AndroidSdkVersion.S_V2),
+        )
+    )
+
+    private val constraintLayout = VersionsDependency(
+        groupId = "androidx.constraintlayout",
+        artifactId = "constraintlayout",
+        versions = listOf(
+            Version("2.1.4", AndroidSdkVersion.P),
+        )
+    )
+
     private fun build(sdkVersion: AndroidSdkVersion): Project {
         return Project(
             artifactId = "androidx-bom-${sdkVersion.sdkInt}",
@@ -347,8 +439,6 @@ object Androidx : IExportArtifact {
 
                     Navigation.compose.build(sdkVersion),
 
-                    Navigation.gradlePlugin.build(sdkVersion),
-
                     Paging.common.build(sdkVersion),
                     Paging.runtime.build(sdkVersion),
                     Paging.compose.build(sdkVersion),
@@ -380,22 +470,51 @@ object Androidx : IExportArtifact {
                     Media3.common.build(sdkVersion),
 
                     Hilt.build(sdkVersion),
-                    Hilt.gradlePlugin.build(sdkVersion),
                     Hilt.compiler.build(sdkVersion),
 
                     startup.build(sdkVersion),
+
+                    Concurrent.Futures.build(sdkVersion),
+                    Concurrent.Futures.ktx.build(sdkVersion),
+
+                    Test.junit.build(sdkVersion),
+                    Test.ext.build(sdkVersion),
+                    Test.espresso.build(sdkVersion),
+                    Test.rules.build(sdkVersion),
+
+                    material.build(sdkVersion),
+
+                    Room.runtime.build(sdkVersion),
+                    Room.ktx.build(sdkVersion),
+                    Room.compiler.build(sdkVersion),
+                    Room.testing.build(sdkVersion),
+                    Room.rxjava2.build(sdkVersion),
+                    Room.rxjava3.build(sdkVersion),
+                    Room.guava.build(sdkVersion),
+                    Room.paging.build(sdkVersion),
+
+                    constraintLayout.build(sdkVersion),
+                )
+            ),
+            build = Build(
+                pluginManagement = PluginManagement(
+                    plugins = listOfNotNull(
+                        Hilt.gradlePlugin.build(sdkVersion),
+                        Navigation.gradlePlugin.build(sdkVersion),
+                    )
                 )
             )
         )
     }
 
-    private const val MODULE_VERSION = "0.0.2-beta"
+    private const val MODULE_VERSION = "0.0.3-beta"
 
     override fun export() {
-        build(AndroidSdkVersion.P).export()
-        build(AndroidSdkVersion.S).export()
-        build(AndroidSdkVersion.S_V2).export()
-        build(AndroidSdkVersion.TIRAMISU).export()
         build(AndroidSdkVersion.UPSIDE_DOWN_CAKE).export()
     }
+}
+
+fun main() {
+
+    Androidx.export()
 }

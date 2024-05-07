@@ -21,7 +21,7 @@ data class License(
     }
 
 
-    override fun build(branch: Branch) {
+    override fun generat(branch: Branch) {
         val element = branch.addElement("license")
         element.addElement(::name.name).addText(name)
         element.addElement(::url.name).addText(url)

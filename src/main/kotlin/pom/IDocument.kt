@@ -4,5 +4,5 @@ import org.dom4j.Branch
 
 interface IDocument {
 
-    fun build(branch: Branch)
+    fun generat(branch: Branch)
 }

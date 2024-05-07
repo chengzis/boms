@@ -16,14 +16,18 @@ data class Project(
     val developers: List<Developer> = listOf(Developer.chengzis),
     val scm: Scm = Scm.boms,
     val dependencyManagement: DependencyManagement,
+    val build: Build
 ) : IDocument {
 
-    override fun build(branch: Branch) {
+    override fun generat(branch: Branch) {
         val element = branch.addElement("project")
 
         element.addAttribute("xmlns", "http://maven.apache.org/POM/4.0.0")
         element.addAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-        element.addAttribute("xsi:schemaLocation", "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd")
+        element.addAttribute(
+            "xsi:schemaLocation",
+            "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+        )
 
         element.addElement(::modelVersion.name).addText(modelVersion)
         element.addElement(::groupId.name).addText(groupId)
@@ -36,22 +40,26 @@ data class Project(
 
         element.addElement(::licenses.name).apply {
             licenses.forEach {
-                it.build(this)
+                it.generat(this)
             }
         }
 
         element.addElement(::developers.name).apply {
             developers.forEach {
-                it.build(this)
+                it.generat(this)
             }
         }
 
         element.addElement(::scm.name).apply {
-            scm.build(this)
+            scm.generat(this)
         }
 
         element.addElement(::dependencyManagement.name).apply {
-            dependencyManagement.build(this)
+            dependencyManagement.generat(this)
+        }
+
+        element.addElement(::build.name).apply {
+            build.generat(this)
         }
     }
 }
